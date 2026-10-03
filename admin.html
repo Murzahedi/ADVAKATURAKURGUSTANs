@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Админ-панель</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="admin">
+
+<header>
+  <div class="logo-block">
+    <img src="https://advokatura.kg/sites/default/files/logotip_advokatury-kr_jpg.jpg" class="logo" alt="logo"
+         onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%232f8fe0%22 rx=%2214%22/%3E%3C/svg%3E'">
+    <div>
+      <h1>Скрытая админ-панель</h1>
+      <p>Управление контентом сайта</p>
+    </div>
+  </div>
+  <div class="lang-buttons">
+    <button onclick="location.href='index.html'">← На сайт</button>
+  </div>
+</header>
+
+<!-- ====================== ЭКРАН ВХОДА ====================== -->
+<div id="loginScreen" class="admin-panel">
+  <div style="max-width:420px; margin:60px auto; background:#fff; padding:36px 30px; border-radius:18px; box-shadow:0 10px 30px rgba(23,86,143,.15);">
+    <div style="text-align:center; font-size:52px; margin-bottom:10px;">🔒</div>
+    <h1 style="text-align:center; color:#0b3d66; font-size:22px; margin-bottom:6px;">Вход в админ-панель</h1>
+    <p style="text-align:center; color:#5b7083; font-size:14px; margin-bottom:22px;">Введите пароль администратора</p>
+    <input type="password" id="loginPass" placeholder="Пароль" autocomplete="current-password">
+    <button class="primary" id="loginBtn" style="width:100%;">Войти</button>
+    <p id="loginErr" style="color:#ff5c5c; text-align:center; margin-top:12px; font-weight:600; min-height:18px;"></p>
+    <p style="text-align:center; color:#8ba3b9; font-size:12px; margin-top:24px;">
+      Пароль по умолчанию: <b>admin2026</b><br>
+      Сменить пароль можно после входа.
+    </p>
+  </div>
+</div>
+
+<!-- ====================== АДМИН-ПАНЕЛЬ ====================== -->
+<div id="adminPanel" class="admin-panel" style="display:none;">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+    <div>
+      <h1 style="color:#0b3d66;">Панель администратора</h1>
+      <p class="hint" style="color:#5b7083; font-size:14px;">Ctrl + Shift + A — быстрый вход. Данные хранятся в localStorage.</p>
+    </div>
+    <button class="primary" id="logoutBtn" style="background:#ff5c5c;">🚪 Выйти</button>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="active" data-tab="tab-lawyer">👤 Добавить адвоката</button>
+    <button data-tab="tab-all-lawyers">📋 Все адвокаты</button>
+    <button data-tab="tab-news">📰 Новость</button>
+    <button data-tab="tab-law">⚖️ Закон</button>
+    <button data-tab="tab-training">🎓 Учебный центр</button>
+    <button data-tab="tab-tools">🛠 Инструменты</button>
+    <button data-tab="tab-password">🔑 Пароль</button>
+  </div>
+
+  <!-- ============ ДОБАВИТЬ / РЕДАКТИРОВАТЬ АДВОКАТА ============ -->
+  <div class="admin-tab active" id="tab-lawyer">
+    <h2 id="lw-form-title">Добавить адвоката</h2>
+    <input type="text" id="lw-name" placeholder="ФИО адвоката *">
+    <input type="text" id="lw-exp" placeholder="Опыт (лет)">
+    <input type="text" id="lw-phone" placeholder="Телефон">
+    <select id="lw-district">
+      <option value="osh_city">Ош шаары</option>
+      <option value="osh_region">Ош облусу</option>
+    </select>
+    <input type="text" id="lw-spec" placeholder="Специализация (напр. уголовное право)">
+    <input type="number" id="lw-rating" step="0.1" min="1" max="10" placeholder="Рейтинг (1–10), по умолчанию 8.5">
+    <textarea id="lw-bio" placeholder="Биография"></textarea>
+    <input type="text" id="lw-awards" placeholder="Награды (через запятую)">
+    <input type="file" id="lw-photo" accept="image/*">
+    <div style="display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;">
+      <button class="primary" id="lw-add">➕ Добавить адвоката</button>
+      <button class="primary" id="lw-cancel" style="display:none; background:#8899aa;">✖ Отменить</button>
+    </div>
+  </div>
+
+  <!-- ============ СПИСОК ВСЕХ АДВОКАТОВ (700+) ============ -->
+  <div class="admin-tab" id="tab-all-lawyers">
+    <h2>Все адвокаты</h2>
+    <input type="text" id="al-search" placeholder="🔍 Поиск по ФИО, телефону, специализации...">
+    <label style="display:flex; align-items:center; gap:8px; margin:6px 0; font-size:14px; color:#5b7083;">
+      <input type="checkbox" id="al-show-hidden" style="width:auto; margin:0;"> Показать скрытых
+    </label>
+    <div id="al-info" style="margin:12px 0; font-size:14px; color:#5b7083; font-weight:600;"></div>
+    <div class="admin-list" id="al-list"></div>
+    <div style="text-align:center; margin-top:18px; display:flex; justify-content:center; align-items:center; gap:14px;">
+      <button class="primary" id="al-prev">← Назад</button>
+      <span id="al-page" style="font-weight:700; color:#0b3d66;"></span>
+      <button class="primary" id="al-next">Вперёд →</button>
+    </div>
+  </div>
+
+  <!-- ============ НОВОСТЬ ============ -->
+  <div class="admin-tab" id="tab-news">
+    <h2>Добавить новость</h2>
+    <input type="text" id="nw-title" placeholder="Название новости *">
+    <textarea id="nw-text" placeholder="Описание новости"></textarea>
+    <input type="date" id="nw-date">
+    <input type="file" id="nw-image" accept="image/*">
+    <button class="primary" id="nw-add">➕ Добавить новость</button>
+    <div class="admin-list" id="nw-list"></div>
+  </div>
+
+  <!-- ============ ЗАКОН ============ -->
+  <div class="admin-tab" id="tab-law">
+    <h2>Добавить закон КР 2026</h2>
+    <input type="text" id="law-title" placeholder="Название закона *">
+    <input type="text" id="law-cat" placeholder="Категория (напр. Уголовное право)">
+    <input type="number" id="law-year" placeholder="Год" value="2026">
+    <textarea id="law-desc" placeholder="Краткое описание"></textarea>
+    <textarea id="law-text" placeholder="Полный текст (для электронной книги)"></textarea>
+    <button class="primary" id="law-add">➕ Добавить закон</button>
+    <div class="admin-list" id="law-list"></div>
+  </div>
+
+  <!-- ============ УЧЕБНЫЙ ЦЕНТР ============ -->
+  <div class="admin-tab" id="tab-training">
+    <h2>Настройки учебного центра</h2>
+    <input type="text" id="tr-address" placeholder="Адрес">
+    <input type="text" id="tr-phone" placeholder="Телефон">
+    <input type="text" id="tr-email" placeholder="E-mail">
+    <input type="text" id="tr-hours" placeholder="Часы работы">
+    <input type="text" id="tr-map" placeholder="Запрос для Google Карт (адрес/координаты)">
+    <button class="primary" id="tr-save">💾 Сохранить настройки</button>
+    <div class="hr"></div>
+    <p style="font-size:13px; color:#5b7083;">Пример запроса карты: <code>Бишкек, улица Киевская 95</code> или <code>42.8746,74.5698</code></p>
+  </div>
+
+  <!-- ============ ИНСТРУМЕНТЫ ============ -->
+  <div class="admin-tab" id="tab-tools">
+    <h2>Инструменты</h2>
+    <button class="primary" id="export-btn">⬇ Экспорт данных (JSON)</button>
+    <div class="hr"></div>
+    <input type="file" id="import-file" accept="application/json">
+    <button class="primary" id="import-btn">⬆ Импорт данных (JSON)</button>
+    <div class="hr"></div>
+    <button class="primary" id="reset-overrides-btn" style="background:#ffb703;">↺ Сбросить правки адвокатов (оставить оригиналы)</button>
+    <div class="hr"></div>
+    <button class="primary" id="reset-btn" style="background:#ff5c5c;">🗑 Сбросить весь пользовательский контент</button>
+  </div>
+
+  <!-- ============ ПАРОЛЬ ============ -->
+  <div class="admin-tab" id="tab-password">
+    <h2>Смена пароля администратора</h2>
+    <input type="password" id="pw-old" placeholder="Текущий пароль">
+    <input type="password" id="pw-new" placeholder="Новый пароль (мин. 4 символа)">
+    <input type="password" id="pw-new2" placeholder="Повторите новый пароль">
+    <button class="primary" id="pw-save">🔑 Сменить пароль</button>
+    <div class="hr"></div>
+    <p style="font-size:13px; color:#5b7083;">
+      Если пароль забыт — открой DevTools (F12) → Application → Local Storage → удали ключ <code>ak_admin_hash</code>. Пароль вернётся к <b>admin2026</b>.
+    </p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="script.js"></script>
+<script>
+/* ============================================================
+   АДМИН-ЛОГИКА
+   ============================================================ */
+(function(){
+
+  /* ============================================================
+     ЧАСТЬ 1. АВТОРИЗАЦИЯ
+     ============================================================ */
+  const loginScreen = document.getElementById('loginScreen');
+  const adminPanel  = document.getElementById('adminPanel');
+  const loginPass   = document.getElementById('loginPass');
+  const loginBtn    = document.getElementById('loginBtn');
+  const loginErr    = document.getElementById('loginErr');
+
+  let adminInitialized = false;
+
+  function showAdmin(){
+    loginScreen.style.display = 'none';
+    adminPanel.style.display  = 'block';
+    if(!adminInitialized){
+      adminInitialized = true;
+      initAdminFeatures();
+    }
+  }
+  function showLogin(){
+    loginScreen.style.display = 'block';
+    adminPanel.style.display  = 'none';
+    loginPass.value = '';
+    loginErr.textContent = '';
+    setTimeout(()=>loginPass.focus(), 50);
+  }
+  function doLogin(){
+    if(loginAdmin(loginPass.value)){
+      showAdmin();
+    }else{
+      loginErr.textContent = '❌ Неверный пароль';
+      loginPass.value = '';
+      loginPass.focus();
+    }
+  }
+  loginBtn.addEventListener('click', doLogin);
+  loginPass.addEventListener('keydown', e=>{ if(e.key === 'Enter') doLogin(); });
+
+  document.getElementById('logoutBtn').addEventListener('click', ()=>{
+    logoutAdmin();
+    showLogin();
+  });
+
+  // Первичная проверка
+  if(isAdminAuth()) showAdmin(); else showLogin();
+
+  /* ============================================================
+     ЧАСТЬ 2. ВСЯ АДМИН-ЛОГИКА (инициализируется после входа)
+     ============================================================ */
+  function initAdminFeatures(){
+
+    /* ---------- Общие утилиты ---------- */
+    const toastEl = document.getElementById('toast');
+    function toast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastEl._tm);
+      toastEl._tm = setTimeout(()=>toastEl.classList.remove('show'), 2200);
+    }
+
+    /* ---------- Вкладки ---------- */
+    document.querySelectorAll('.admin-tabs button').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.querySelectorAll('.admin-tabs button').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+        if(btn.dataset.tab === 'tab-all-lawyers') renderAllLawyers();
+      });
+    });
+
+    function switchToTab(tabId){
+      document.querySelectorAll('.admin-tabs button').forEach(b=>{
+        b.classList.toggle('active', b.dataset.tab === tabId);
+      });
+      document.querySelectorAll('.admin-tab').forEach(t=>{
+        t.classList.toggle('active', t.id === tabId);
+      });
+    }
+
+    /* ---------- Загрузка фото ---------- */
+    function readImageResized(file, maxSize, cb){
+      const reader = new FileReader();
+      reader.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+          const c = document.createElement('canvas');
+          c.width  = Math.max(1, Math.round(img.width  * scale));
+          c.height = Math.max(1, Math.round(img.height * scale));
+          c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+          cb(c.toDataURL('image/jpeg', 0.82));
+        };
+        img.onerror = ()=> cb(null);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    /* ============================================================
+       БЛОК А: ФОРМА АДВОКАТА (добавление + редактирование)
+       ============================================================ */
+    let photoData = null;
+    let editId = null;
+
+    document.getElementById('lw-photo').addEventListener('change', function(){
+      const f = this.files[0];
+      photoData = null;
+      if(!f) return;
+      readImageResized(f, 420, data=>{
+        photoData = data;
+        toast('Фото загружено ✓');
+      });
+    });
+
+    function resetLawyerForm(){
+      editId = null;
+      ['lw-name','lw-exp','lw-phone','lw-spec','lw-bio','lw-awards','lw-rating']
+        .forEach(id => document.getElementById(id).value = '');
+      document.getElementById('lw-photo').value = '';
+      photoData = null;
+      document.getElementById('lw-add').textContent = '➕ Добавить адвоката';
+      document.getElementById('lw-cancel').style.display = 'none';
+      document.getElementById('lw-form-title').textContent = 'Добавить адвоката';
+    }
+
+    document.getElementById('lw-cancel').addEventListener('click', ()=>{
+      resetLawyerForm();
+      toast('Редактирование отменено');
+    });
+
+    document.getElementById('lw-add').addEventListener('click', ()=>{
+      const name = document.getElementById('lw-name').value.trim();
+      if(!name){ toast('Введите ФИО'); return; }
+
+      const exp    = parseInt(document.getElementById('lw-exp').value) || 1;
+      const rating = parseFloat(document.getElementById('lw-rating').value) || 8.5;
+      const data = {
+        name,
+        exp,
+        phone:    document.getElementById('lw-phone').value.trim() || '+996 ___ ___ ___',
+        district: document.getElementById('lw-district').value,
+        spec:     document.getElementById('lw-spec').value.trim() || 'гражданском праве',
+        rating:   Math.max(1, Math.min(10, rating)),
+        bio:      document.getElementById('lw-bio').value.trim(),
+        awards:   document.getElementById('lw-awards').value.trim()
+                    .split(',').map(s=>s.trim()).filter(Boolean)
+      };
+      if(!data.bio){
+        data.bio = `${name} — адвокат с опытом работы ${exp} лет. Специализируется на ${data.spec}. Член Адвокатуры Кыргызской Республики.`;
+      }
+
+      if(editId){
+        /* --- РЕЖИМ РЕДАКТИРОВАНИЯ --- */
+        if(editId.startsWith('c_')){
+          // кастомный адвокат — правим напрямую
+          const arr = AK.get(K.lawyers, []);
+          const idx = arr.findIndex(x => x.id === editId);
+          if(idx >= 0){
+            data.photo = photoData || arr[idx].photo || avatarImage(name, 400);
+            arr[idx] = Object.assign({}, arr[idx], data);
+            AK.set(K.lawyers, arr);
+          }
+        }else{
+          // сгенерированный (osh_*) — сохраняем override
+          if(!photoData) data.photo = avatarImage(name, 400);
+          else data.photo = photoData;
+          saveLawyerOverride(editId, data);
+        }
+        invalidateLawyers();
+        toast('Изменения сохранены ✓');
+        resetLawyerForm();
+        renderAllLawyers();
+      }else{
+        /* --- СОЗДАНИЕ НОВОГО --- */
+        data.photo = photoData || avatarImage(name, 400);
+        const lawyer = Object.assign({ id: 'c_' + Date.now(), region: 'osh' }, data);
+        const arr = AK.get(K.lawyers, []);
+        arr.unshift(lawyer);
+        if(!AK.set(K.lawyers, arr)){ toast('Ошибка сохранения (хранилище переполнено)'); return; }
+        invalidateLawyers();
+        toast('Адвокат добавлен ✓');
+        resetLawyerForm();
+      }
+    });
+
+    /* ============================================================
+       БЛОК Б: СПИСОК ВСЕХ АДВОКАТОВ (700+)
+       ============================================================ */
+    let alPage = 0;
+    const AL_PER_PAGE = 30;
+
+    const alSearch     = document.getElementById('al-search');
+    const alShowHidden = document.getElementById('al-show-hidden');
+    const alInfo       = document.getElementById('al-info');
+    const alList       = document.getElementById('al-list');
+    const alPageInfo   = document.getElementById('al-page');
+
+    alSearch.addEventListener('input', ()=>{ alPage = 0; renderAllLawyers(); });
+    alShowHidden.addEventListener('change', ()=>{ alPage = 0; renderAllLawyers(); });
+    document.getElementById('al-prev').addEventListener('click', ()=>{
+      if(alPage > 0){ alPage--; renderAllLawyers(); window.scrollTo({top:0,behavior:'smooth'}); }
+    });
+    document.getElementById('al-next').addEventListener('click', ()=>{
+      alPage++; renderAllLawyers(); window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    function renderAllLawyers(){
+      if(adminPanel.style.display === 'none') return;
+
+      const q = alSearch.value.trim().toLowerCase();
+      const showHidden = alShowHidden.checked;
+
+      let list = getAllLawyersRaw();
+      if(!showHidden) list = list.filter(l => !isLawyerHidden(l.id));
+      if(q){
+        list = list.filter(l =>
+          (l.name + ' ' + (l.phone||'') + ' ' + (l.spec||'') + ' ' + (l.district||''))
+            .toLowerCase().includes(q)
+        );
+      }
+
+      const total = list.length;
+      const pages = Math.max(1, Math.ceil(total / AL_PER_PAGE));
+      if(alPage >= pages) alPage = pages - 1;
+      if(alPage < 0) alPage = 0;
+      const start = alPage * AL_PER_PAGE;
+      const slice = list.slice(start, start + AL_PER_PAGE);
+
+      alInfo.textContent = `Найдено: ${total} адвокатов  •  Страница ${alPage+1} из ${pages}`;
+      alPageInfo.textContent = `${alPage+1} / ${pages}`;
+
+      if(!slice.length){
+        alList.innerHTML = '<p style="color:#5b7083; padding:20px; text-align:center;">Ничего не найдено</p>';
+        return;
+      }
+
+      alList.innerHTML = slice.map(l=>{
+        const hidden = isLawyerHidden(l.id);
+        const edited = isLawyerOverridden(l.id);
+        const isCustom = l.id.startsWith('c_');
+        return `
+          <div class="admin-item" style="${hidden?'opacity:.55;':''}">
+            <div class="info">
+              <b>${escapeHtml(l.name)}</b>
+              <span style="font-size:12px; color:#5b7083; margin-left:8px;">
+                ${l.exp} лет • ${escapeHtml(l.phone||'—')} • ${l.district==='osh_region'?'Ош облусу':'Ош шаары'}
+              </span>
+              ${isCustom ? '<span style="background:#2f8fe0;color:#fff;border-radius:6px;padding:2px 7px;font-size:10px;margin-left:8px;">свой</span>' : ''}
+              ${edited ? '<span style="background:#ffb703;color:#fff;border-radius:6px;padding:2px 7px;font-size:10px;margin-left:6px;">изменён</span>' : ''}
+              ${hidden ? '<span style="background:#8899aa;color:#fff;border-radius:6px;padding:2px 7px;font-size:10px;margin-left:6px;">скрыт</span>' : ''}
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button data-edit="${l.id}" style="background:#2f8fe0;" title="Редактировать">✎</button>
+              ${hidden
+                ? `<button data-restore="${l.id}" style="background:#4caf50;" title="Восстановить">↺</button>`
+                : `<button data-del="${l.id}" title="Удалить/скрыть">🗑</button>`}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      alList.querySelectorAll('button[data-edit]').forEach(b=>{
+        b.addEventListener('click', ()=> startEditLawyer(b.dataset.edit));
+      });
+      alList.querySelectorAll('button[data-del]').forEach(b=>{
+        b.addEventListener('click', ()=> deleteLawyerById(b.dataset.del));
+      });
+      alList.querySelectorAll('button[data-restore]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          unhideLawyer(b.dataset.restore);
+          invalidateLawyers();
+          renderAllLawyers();
+          toast('Восстановлен ✓');
+        });
+      });
+    }
+
+    function startEditLawyer(id){
+      const lawyer = getAllLawyersRaw().find(l => l.id === id);
+      if(!lawyer){ toast('Не найден'); return; }
+
+      editId = id;
+      document.getElementById('lw-name').value    = lawyer.name;
+      document.getElementById('lw-exp').value     = lawyer.exp;
+      document.getElementById('lw-phone').value   = lawyer.phone || '';
+      document.getElementById('lw-district').value= lawyer.district || 'osh_city';
+      document.getElementById('lw-spec').value    = lawyer.spec || '';
+      document.getElementById('lw-rating').value  = lawyer.rating || 8.5;
+      document.getElementById('lw-bio').value     = lawyer.bio || '';
+      document.getElementById('lw-awards').value  = (lawyer.awards || []).join(', ');
+      photoData = lawyer.photo || null;
+
+      document.getElementById('lw-add').textContent = '💾 Сохранить изменения';
+      document.getElementById('lw-cancel').style.display = 'inline-block';
+      document.getElementById('lw-form-title').textContent = '✎ Редактирование: ' + lawyer.name;
+
+      switchToTab('tab-lawyer');
+      window.scrollTo({top:0, behavior:'smooth'});
+      toast('Режим редактирования');
+    }
+
+    function deleteLawyerById(id){
+      if(!confirm('Удалить этого адвоката?')) return;
+      if(id.startsWith('c_')){
+        // свой — удаляем полностью
+        AK.set(K.lawyers, AK.get(K.lawyers, []).filter(x => x.id !== id));
+      }else{
+        // сгенерированный — скрываем
+        hideLawyer(id);
+      }
+      invalidateLawyers();
+      renderAllLawyers();
+      toast('Удалён');
+    }
+
+    /* ============================================================
+       БЛОК В: НОВОСТИ
+       ============================================================ */
+    let newsPhoto = null;
+    document.getElementById('nw-image').addEventListener('change', function(){
+      const f = this.files[0];
+      newsPhoto = null;
+      if(!f) return;
+      readImageResized(f, 700, data=>{
+        newsPhoto = data;
+        toast('Изображение загружено ✓');
+      });
+    });
+
+    function renderNewsAdmin(){
+      const list = AK.get(K.news, []);
+      const box = document.getElementById('nw-list');
+      if(!list.length){
+        box.innerHTML = `<p style="color:#5b7083;font-size:14px;">Пока нет добавленных новостей.</p>`;
+        return;
+      }
+      box.innerHTML = list.map(n=>`
+        <div class="admin-item">
+          <div class="info"><b>${escapeHtml(n.title)}</b><br>
+            <span style="font-size:12px;color:#5b7083;">${escapeHtml(n.date||'')}</span>
+          </div>
+          <button data-del="${n.id}">Удалить</button>
+        </div>
+      `).join('');
+      box.querySelectorAll('button[data-del]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          AK.set(K.news, AK.get(K.news, []).filter(x=>x.id !== b.dataset.del));
+          renderNewsAdmin();
+          toast('Новость удалена');
+        });
+      });
+    }
+
+    document.getElementById('nw-add').addEventListener('click', ()=>{
+      const title = document.getElementById('nw-title').value.trim();
+      if(!title){ toast('Введите название'); return; }
+      const text = document.getElementById('nw-text').value.trim();
+      const date = document.getElementById('nw-date').value || new Date().toISOString().slice(0,10);
+      const item = {
+        id: 'cn_' + Date.now(),
+        title, text, date,
+        image: newsPhoto || placeholderImage(title)
+      };
+      const arr = AK.get(K.news, []);
+      arr.unshift(item);
+      if(!AK.set(K.news, arr)){ toast('Ошибка сохранения'); return; }
+      ['nw-title','nw-text','nw-date'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('nw-image').value = '';
+      newsPhoto = null;
+      renderNewsAdmin();
+      toast('Новость добавлена ✓');
+    });
+
+    /* ============================================================
+       БЛОК Г: ЗАКОНЫ
+       ============================================================ */
+    function renderLawsAdmin(){
+      const list = AK.get(K.laws, []);
+      const box = document.getElementById('law-list');
+      if(!list.length){
+        box.innerHTML = `<p style="color:#5b7083;font-size:14px;">Пока нет добавленных законов.</p>`;
+        return;
+      }
+      box.innerHTML = list.map(l=>`
+        <div class="admin-item">
+          <div class="info"><b>${escapeHtml(l.title)}</b><br>
+            <span style="font-size:12px;color:#5b7083;">${l.year} • ${escapeHtml(l.category||'')}</span>
+          </div>
+          <button data-del="${l.id}">Удалить</button>
+        </div>
+      `).join('');
+      box.querySelectorAll('button[data-del]').forEach(b=>{
+        b.addEventListener('click', ()=>{
+          AK.set(K.laws, AK.get(K.laws, []).filter(x=>x.id !== b.dataset.del));
+          renderLawsAdmin();
+          toast('Закон удалён');
+        });
+      });
+    }
+
+    document.getElementById('law-add').addEventListener('click', ()=>{
+      const title = document.getElementById('law-title').value.trim();
+      if(!title){ toast('Введите название закона'); return; }
+      const item = {
+        id: 'cl_' + Date.now(),
+        title,
+        category: document.getElementById('law-cat').value.trim() || 'Общее право',
+        year: parseInt(document.getElementById('law-year').value) || 2026,
+        desc: document.getElementById('law-desc').value.trim(),
+        text: document.getElementById('law-text').value.trim() || document.getElementById('law-desc').value.trim()
+      };
+      const arr = AK.get(K.laws, []);
+      arr.unshift(item);
+      if(!AK.set(K.laws, arr)){ toast('Ошибка сохранения'); return; }
+      ['law-title','law-cat','law-desc','law-text'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('law-year').value = 2026;
+      renderLawsAdmin();
+      toast('Закон добавлен ✓');
+    });
+
+    /* ============================================================
+       БЛОК Д: УЧЕБНЫЙ ЦЕНТР
+       ============================================================ */
+    function loadTrainingForm(){
+      const c = getTraining();
+      document.getElementById('tr-address').value = c.address;
+      document.getElementById('tr-phone').value   = c.phone;
+      document.getElementById('tr-email').value   = c.email;
+      document.getElementById('tr-hours').value   = c.hours;
+      document.getElementById('tr-map').value     = c.mapQuery;
+    }
+
+    document.getElementById('tr-save').addEventListener('click', ()=>{
+      const cfg = {
+        address:  document.getElementById('tr-address').value.trim(),
+        phone:    document.getElementById('tr-phone').value.trim(),
+        email:    document.getElementById('tr-email').value.trim(),
+        hours:    document.getElementById('tr-hours').value.trim(),
+        mapQuery: document.getElementById('tr-map').value.trim()
+      };
+      AK.set(K.training, cfg);
+      toast('Настройки сохранены ✓');
+    });
+
+    /* ============================================================
+       БЛОК Е: ЭКСПОРТ / ИМПОРТ / СБРОС
+       ============================================================ */
+    document.getElementById('export-btn').addEventListener('click', ()=>{
+      const data = {
+        lawyers:   AK.get(K.lawyers, []),
+        overrides: AK.get(K.overrides, {}),
+        hidden:    AK.get(K.hidden, []),
+        news:      AK.get(K.news, []),
+        laws:      AK.get(K.laws, []),
+        training:  AK.get(K.training, {})
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'advokatura-data-' + new Date().toISOString().slice(0,10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      toast('Данные экспортированы');
+    });
+
+    document.getElementById('import-btn').addEventListener('click', ()=>{
+      const f = document.getElementById('import-file').files[0];
+      if(!f){ toast('Выберите файл'); return; }
+      const reader = new FileReader();
+      reader.onload = e=>{
+        try{
+          const data = JSON.parse(e.target.result);
+          if(data.lawyers)   AK.set(K.lawyers,   data.lawyers);
+          if(data.overrides) AK.set(K.overrides, data.overrides);
+          if(data.hidden)    AK.set(K.hidden,    data.hidden);
+          if(data.news)      AK.set(K.news,      data.news);
+          if(data.laws)      AK.set(K.laws,      data.laws);
+          if(data.training)  AK.set(K.training,  data.training);
+          invalidateLawyers();
+          renderAll();
+          toast('Данные импортированы ✓');
+        }catch(err){ toast('Ошибка чтения файла'); }
+      };
+      reader.readAsText(f);
+    });
+
+    document.getElementById('reset-overrides-btn').addEventListener('click', ()=>{
+      if(!confirm('Сбросить все правки сгенерированных адвокатов?')) return;
+      localStorage.removeItem(K.overrides);
+      localStorage.removeItem(K.hidden);
+      invalidateLawyers();
+      renderAll();
+      toast('Правки адвокатов сброшены');
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', ()=>{
+      if(!confirm('Удалить ВЕСЬ пользовательский контент?')) return;
+      [K.lawyers, K.news, K.laws, K.training, K.overrides, K.hidden].forEach(k=>localStorage.removeItem(k));
+      invalidateLawyers();
+      renderAll();
+      toast('Данные сброшены');
+    });
+
+    /* ============================================================
+       БЛОК Ж: СМЕНА ПАРОЛЯ
+       ============================================================ */
+    document.getElementById('pw-save').addEventListener('click', ()=>{
+      const oldPw  = document.getElementById('pw-old').value;
+      const newPw  = document.getElementById('pw-new').value;
+      const newPw2 = document.getElementById('pw-new2').value;
+      if(!newPw || newPw.length < 4){ toast('Пароль минимум 4 символа'); return; }
+      if(newPw !== newPw2){ toast('Пароли не совпадают'); return; }
+      if(!changeAdminPassword(oldPw, newPw)){ toast('Неверный текущий пароль'); return; }
+      ['pw-old','pw-new','pw-new2'].forEach(id => document.getElementById(id).value = '');
+      toast('Пароль изменён ✓');
+    });
+
+    /* ============================================================
+       Инициализация всего
+       ============================================================ */
+    function renderAll(){
+      renderNewsAdmin();
+      renderLawsAdmin();
+      loadTrainingForm();
+      renderAllLawyers();
+    }
+    renderAll();
+  }
+
+})();
+</script>
+</body>
+</html>

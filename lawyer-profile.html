@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Профиль адвоката</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-page="profile">
+
+<header>
+  <div class="logo-block">
+    <img src="https://advokatura.kg/sites/default/files/logotip_advokatury-kr_jpg.jpg" class="logo" alt="logo"
+         onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%232f8fe0%22 rx=%2214%22/%3E%3C/svg%3E'">
+    <div>
+      <h1 data-i18n="site_title">Адвокатура Кыргызстана</h1>
+      <p data-i18n="site_sub">Официальный юридический портал</p>
+    </div>
+  </div>
+  <div class="lang-buttons">
+    <button data-lang="ru" onclick="setLanguage('ru')">Русский</button>
+    <button data-lang="kg" onclick="setLanguage('kg')">Кыргызча</button>
+  </div>
+</header>
+
+<nav>
+  <a href="index.html" data-i18n="nav_home">Главная</a>
+  <a href="lawyers.html" data-i18n="nav_lawyers">Адвокаты</a>
+  <a href="news.html" data-i18n="nav_news">Новости</a>
+  <a href="training.html" data-i18n="nav_training">Учебный центр</a>
+  <a href="legislation.html" data-i18n="nav_law">Законодательство</a>
+</nav>
+
+<section class="profile" id="profileBox"></section>
+
+<footer><p data-i18n="footer">© 2026 Адвокатура Кыргызстана. Все права защищены.</p></footer>
+
+<script src="script.js"></script>
+</body>
+</html>

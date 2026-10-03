@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Адвокатура Кыргызстана</title>
+<link rel="stylesheet" href="style.css?v=2">
+</head>
+<body data-page="index">
+
+<header>
+  <div class="logo-block">
+    <img src="https://advokatura.kg/sites/default/files/logotip_advokatury-kr_jpg.jpg"
+         class="logo" alt="logo"
+         onerror="this.onerror=null;this.src='data:image/svg+xml;charset=utf-8,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2280%22%3E%3Crect width=%2280%22 height=%2280%22 fill=%22%232f8fe0%22 rx=%2214%22/%3E%3C/svg%3E'">
+    <div>
+      <h1 data-i18n="site_title">Адвокатура Кыргызстана</h1>
+      <p data-i18n="site_sub">Официальный юридический портал</p>
+    </div>
+  </div>
+  <div class="lang-buttons">
+    <button data-lang="ru" onclick="setLanguage('ru')">Русский</button>
+    <button data-lang="kg" onclick="setLanguage('kg')">Кыргызча</button>
+  </div>
+</header>
+
+<nav>
+  <a href="index.html" data-i18n="nav_home">Главная</a>
+  <a href="lawyers.html" data-i18n="nav_lawyers">Адвокаты</a>
+  <a href="news.html" data-i18n="nav_news">Новости</a>
+  <a href="training.html" data-i18n="nav_training">Учебный центр</a>
+  <a href="legislation.html" data-i18n="nav_law">Законодательство</a>
+</nav>
+
+<section class="hero">
+  <h2 data-i18n="hero_title">Добро пожаловать</h2>
+  <p data-i18n="hero_text">Официальный сайт адвокатуры Кыргызской Республики</p>
+</section>
+
+<section class="search-box">
+  <input type="text" id="searchInput" data-i18n-ph="search_ph" placeholder="Поиск адвокатов, новостей...">
+</section>
+
+<section class="news-section">
+  <div class="section-head">
+    <h2 data-i18n="news_title">Свежие новости</h2>
+    <a href="news.html" class="link-all" data-i18n="news_all">Все новости →</a>
+  </div>
+  <div id="newsList" class="news-list"></div>
+</section>
+
+<footer><p data-i18n="footer">© 2026 Адвокатура Кыргызстана. Все права защищены.</p></footer>
+
+<script src="script.js?v=2"></script>
+</body>
+</html>
